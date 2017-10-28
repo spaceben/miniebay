@@ -16,18 +16,40 @@ def ws_message(message, group_name):
     group_id = group_name[5:]
     jsonmessage = json.loads(message.content['text'])
     mygroup = OtreeGroup.objects.get(id=group_id)
-    curbuyer_id_in_group = jsonmessage['id_in_group']
-    mygroup.price += 10
-    mygroup.buyer = curbuyer_id_in_group
-    now = time.time()
-    mygroup.auctionenddate = now + Constants.extra_time
+    myplayer = mygroup.get_player_by_id( jsonmessage['id_in_group'] )
+
+    if myplayer.role() == 'buyer':
+        x = json.loads( mygroup.buyer )    
+        print('BUYER loaded')  
+    elif myplayer.role() == 'seller':
+        x = json.loads( mygroup.seller )
+        print('SELLER loaded')    
+    else:
+        print('failed')
+
+    x.append( float( jsonmessage['value'] ) )
+
+    # aufsteigend sortiert
+    x.sort()
+    
+    if myplayer.role() == 'buyer':
+        x.reverse()
+
+    if myplayer.role() == 'buyer':
+        mygroup.buyer = x    
+    else:
+        mygroup.seller = x
+    
     mygroup.save()
-    time_left = round(mygroup.auctionenddate - now)
+    
+    print('SELLER ', mygroup.seller)
+    print('BUYER ', mygroup.buyer)
+
     textforgroup = json.dumps({
-                                "price": mygroup.price,
-                                "time_left": time_left,
-                                "winner": curbuyer_id_in_group,
+                                'role': myplayer.role(),
+                                'value': x,
                                 })
+    print(textforgroup)
     Group(group_name).send({
         "text": textforgroup,
     })

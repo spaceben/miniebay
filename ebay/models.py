@@ -6,7 +6,7 @@ import random
 from django import forms
 import time
 import datetime
-author = 'Filipp Chapkovskii, UZH, chapkovski@gmail.com'
+import json
 
 doc = """
 ebay auction example
@@ -27,28 +27,17 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
     def before_session_starts(self):
         for g in self.get_groups():
-            g.price = 0
+            g.seller = json.dumps([])
+            g.buyer = json.dumps([])
 
 
 class Group(BaseGroup):
-    price = models.IntegerField()
-    auctionstartdate = models.FloatField()
-    auctionenddate = models.FloatField()
-    buyer = models.IntegerField()
-
-    def time_left(self):
-            now = time.time()
-            time_left = self.auctionenddate - now
-            time_left = round(time_left) if time_left > 0 else 0
-            return time_left
-
-    def set_payoffs(self):
-        for p in self.get_players():
-            if str(self.buyer) == str(p.id_in_group):
-                p.payoff = Constants.endowment - self.price + Constants.prize
-            else:
-                p.payoff = Constants.endowment
+    buyer = models.TextField()
+    seller = models.TextField()
 
 class Player(BasePlayer):
-    ...
-    # buyer = models.BooleanField()
+    def role(self):
+        if self.id % 2 == 0:
+            return 'buyer'
+        else:
+            return 'seller'
