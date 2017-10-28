@@ -34,27 +34,47 @@ def ws_message(message, group_name):
     
     if myplayer.role() == 'buyer':
         x.reverse()
-
+    print(type(x), 'x...')
     if myplayer.role() == 'buyer':
-        mygroup.buyer = x    
+        mygroup.buyer = json.dumps(x)
     else:
-        mygroup.seller = x
+        mygroup.seller = json.dumps(x)
     
     mygroup.save()
     
     print('SELLER ', mygroup.seller)
     print('BUYER ', mygroup.buyer)
 
+
+
+    asks = json.loads(mygroup.seller)
+    bids = json.loads(mygroup.buyer)
+    print(type(asks))
+    print(type(bids))
+
+    selling_price = None
+    buying_price = None
+
+    if len(asks) and len(bids) > 1:
+        for i in range(len(asks)):
+            try:
+                if asks[i] <= bids[i]:
+                    selling_price = asks[i]
+                    buying_price = bids[i]
+            except:
+                pass
+    print('Selling Price', selling_price, 'Buying Price', buying_price)
+
     textforgroup = json.dumps({
-                                'role': myplayer.role(),
-                                'value': x,
-                                })
+        'role': myplayer.role(),
+        'value': x,
+        'selling_price': selling_price,
+        'buying_price': buying_price
+    })
     print(textforgroup)
     Group(group_name).send({
         "text": textforgroup,
     })
-
-
 
 # Connected to websocket.disconnect
 def ws_disconnect(message, group_name):
