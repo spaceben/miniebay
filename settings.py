@@ -110,7 +110,7 @@ SESSION_CONFIGS = [
     {
         'name': 'ebay',
         'display_name': 'ebay',
-        'num_demo_participants': 3,
+        'num_demo_participants': 4,
         'app_sequence': ['ebay', ],
     },
 ]

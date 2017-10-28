@@ -15,13 +15,8 @@ ebay auction example
 
 class Constants(BaseConstants):
     name_in_url = 'ebay'
-    players_per_group = 3
+    players_per_group = 4
     num_rounds = 1
-    starting_time = 15
-    extra_time = 15
-    endowment = 100
-    prize = 200
-    num_others = players_per_group - 1
 
 
 class Subsession(BaseSubsession):
